@@ -13,7 +13,7 @@ app.message('hello',async ({message, say}) => {
   await say(`Hello World`)
 })
 
-app.command('/wan',async ({ack, body, client, logger}) => {
+app.command('/event',async ({ack, body, client, logger}) => {
   await ack();
 
   try {
@@ -27,7 +27,7 @@ app.command('/wan',async ({ack, body, client, logger}) => {
         callback_id: 'scheduler',
         title: {
           type: 'plain_text',
-          text: 'ねぇねぇ〜あそぼうよ〜'
+          text: 'つどい君がイベントをお知らせします'
         },
         blocks: [
           {
@@ -49,7 +49,7 @@ app.command('/wan',async ({ack, body, client, logger}) => {
               action_id: 'title',
               placeholder: {
                 type: 'plain_text',
-                text: '見本です'
+                text: 'カレー食べ放題企画'
               }
             }
           },
@@ -94,7 +94,7 @@ app.command('/wan',async ({ack, body, client, logger}) => {
               multiline: true,
               placeholder: {
                 type: 'plain_text',
-                text: 'みんなあそぼ！美味しいご飯食べよ！'
+                text: '予算：\n募集人数：\n対象者：\n具体的な内容：'
               }
             }
           },
@@ -112,7 +112,7 @@ app.command('/wan',async ({ack, body, client, logger}) => {
   }
 });
 
-app.view('scheduler', async ({ ack, view, client, logger }) => {
+app.view('scheduler', async ({ ack, body, view, client, logger }) => {
   // モーダルでのデータ送信リクエストを確認
   await ack();
 
@@ -121,6 +121,7 @@ app.view('scheduler', async ({ ack, view, client, logger }) => {
   let unixTime = view['state']['values']['input_date']['date'].selected_date_time;
   const place = view['state']['values']['input_place']['place'].value;
   const description = view['state']['values']['input_description']['description'].value;
+  const organizer = body['user']['username']; // 途中です
 
   unixTime = unixTime + 60 * 60 * 9;
   const date = new Date(unixTime * 1000);
@@ -129,7 +130,7 @@ app.view('scheduler', async ({ ack, view, client, logger }) => {
   try {
     await client.chat.postMessage({
       channel: process.env.TARGET_RECEIVER_CHANNEL_ID,
-      text: `イベント${title}が提案された、場所は${place}です！${description}。${date.toLocaleDateString('ja-JP')} ${date.toLocaleTimeString('ja-JP').slice(0, -3)}`
+      text: `${organizer}さんがイベント「${title}」を提案したワン！\n集合場所：${place}\n日時　　：${date.toLocaleDateString('ja-JP')} ${date.toLocaleTimeString('ja-JP').slice(0, -3)}\n他お知らせは下記をご参照下さいだわん！\n${description}`
     });
   }
   catch (error) {
