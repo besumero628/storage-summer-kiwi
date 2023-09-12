@@ -16,6 +16,9 @@ app.message('hello',async ({message, say}) => {
 app.command('/event',async ({ack, body, client, logger}) => {
   await ack();
 
+  let today = new Date().getTime();
+  today = Math.floor(today / 1000);
+
   try {
     const result = await client.views.open({
       // 適切な trigger_id を受け取ってから 3 秒以内に渡す
@@ -27,14 +30,14 @@ app.command('/event',async ({ack, body, client, logger}) => {
         callback_id: 'scheduler',
         title: {
           type: 'plain_text',
-          text: 'つどい君がイベントをお知らせします'
+          text: 'イベントをお知らせします'
         },
         blocks: [
           {
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: '※入力方法など決まってから注意書きなど…'
+              text: `送信後${process.env.POSTING_CHANNEL_NAME}に投稿されます`
             }
           },
           {
@@ -62,8 +65,9 @@ app.command('/event',async ({ack, body, client, logger}) => {
             },
             element: {
               type: 'datetimepicker',
-              action_id: 'date'
-            }
+              action_id: 'date',
+              initial_date_time: today
+            },
           },
           {
             type: 'input',
@@ -92,10 +96,7 @@ app.command('/event',async ({ack, body, client, logger}) => {
               type: 'plain_text_input',
               action_id: 'description',
               multiline: true,
-              placeholder: {
-                type: 'plain_text',
-                text: '予算：\n募集人数：\n対象者：\n具体的な内容：'
-              }
+              initial_value: '予算：\n募集人数：\n対象者：\n具体的な内容：'
             }
           },
         ],
@@ -130,7 +131,7 @@ app.view('scheduler', async ({ ack, body, view, client, logger }) => {
   try {
     await client.chat.postMessage({
       channel: process.env.TARGET_RECEIVER_CHANNEL_ID,
-      text: `${organizer}さんがイベント「${title}」を提案したワン！\n集合場所：${place}\n日時　　：${date.toLocaleDateString('ja-JP')} ${date.toLocaleTimeString('ja-JP').slice(0, -3)}\n他お知らせは下記をご参照下さいだわん！\n${description}`
+      text: `${organizer}さんがイベント「${title}」を提案したワン！\n集合場所：${place}\n日時　　：${date.toLocaleDateString('ja-JP')} ${date.toLocaleTimeString('ja-JP').slice(0, -3)}\n\n【備考】\n${description}`
     });
   }
   catch (error) {
