@@ -122,7 +122,7 @@ app.view('scheduler', async ({ ack, body, view, client, logger }) => {
   let unixTime = view['state']['values']['input_date']['date'].selected_date_time;
   const place = view['state']['values']['input_place']['place'].value;
   const description = view['state']['values']['input_description']['description'].value;
-  const organizer = body['user']['username']; // 途中です
+  const organizer = body['user']['username'];
 
   unixTime = unixTime + 60 * 60 * 9;
   const date = new Date(unixTime * 1000);
@@ -131,7 +131,7 @@ app.view('scheduler', async ({ ack, body, view, client, logger }) => {
   try {
     await client.chat.postMessage({
       channel: process.env.TARGET_RECEIVER_CHANNEL_ID,
-      text: `${organizer}さんがイベント「${title}」を提案したワン！\n集合場所：${place}\n日時　　：${date.toLocaleDateString('ja-JP')} ${date.toLocaleTimeString('ja-JP').slice(0, -3)}\n\n【備考】\n${description}`
+      text: `<@${organizer}>さんがイベント「${title}」を提案したワン！\n集合場所：${place}\n日時　　：${date.toLocaleDateString('ja-JP')} ${date.toLocaleTimeString('ja-JP').slice(0, -3)}\n\n【備考】\n${description}`
     });
   }
   catch (error) {
