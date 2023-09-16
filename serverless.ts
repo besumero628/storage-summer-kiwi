@@ -12,7 +12,7 @@ const serverlessConfiguration: AWS = {
   ],
   provider: {
     name: 'aws',
-    runtime: 'nodejs14.x',
+    runtime: 'nodejs18.x',
     region: 'ap-northeast-1',
     apiGateway: {
       minimumCompressionSize: 1024,
@@ -32,7 +32,7 @@ const serverlessConfiguration: AWS = {
       minify: false,
       sourcemap: true,
       exclude: ['aws-sdk'],
-      target: 'node14',
+      target: 'node18',
       define: { 'require.resolve': undefined },
       platform: 'node',
       concurrency: 10,
